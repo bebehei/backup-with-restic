@@ -1,39 +1,39 @@
-# backup-with-borg
+# backup-with-restic
 
-Backup tool to create easily archives with borgbackup.
+Backup tool to create easily repositories with [restic](https://restic.net/).
 
 ## Usage
 
 ```
-backup do-create
+backup do-backup
 ```
 
-Create a new archive with your current configuration.
+Create a new snapshot with your current configuration.
 
 ```
-backup do-prune
+backup do-forget
 ```
 
-Prune your archives according to `KEEP_*` variables in the configuration file.
+Forget your snapshots according to `KEEP_*` variables in the configuration file.
 
 ```
-backup (do)
+backup (run)
 backup
 ```
 
-Create a new archive and then prune the repository archives. (Wraps `do-create` and `do-prune`)
+Create a new snapshot and then delete the repository snapshots. (Wraps `do-backup` and `do-forget`)
 
 ### Wrapper
 
-You also can use native `borg` commands like `list` or mount. These will respect the exported `BORG_*` variables. So a plain `backup list` will list all of your current archives in the configured repository.
+You also can use native `restic` commands like `snapshots` or `mount`. These will respect the exported `RESTIC_*` variables. So a plain `backup snapshots` will list all of your current snapshots in the configured repository.
 
 ## Installation
 
-You need to have [borgbackup](https://github.com/borgbackup/borg/) prior to your first run. See [borg's installations instructions](https://borgbackup.readthedocs.io/en/stable/installation.html) for details.
+You need to have [restic](https://restic.net) prior to your first run. See [restic's installations instructions](https://restic.readthedocs.io/en/stable/020_installation.html) for details.
 
     # install scripts
-    git clone https://github.com/bebehei/backup-with-borg
-    cd backup-with-borg
+    git clone https://github.com/bebehei/backup-with-restic
+    cd backup-with-restic
     make install
     cp /etc/backup/{example,default}.env
 
@@ -41,7 +41,7 @@ You need to have [borgbackup](https://github.com/borgbackup/borg/) prior to your
     $EDITOR /etc/backup/default.env
 
     # initialize everything
-    backup init -e <preferred_encryption_technique>
+    backup init
 
     # add cronjob (for hourly backup)
     { crontab -l ; echo "0 * * * * backup"; } | crontab -

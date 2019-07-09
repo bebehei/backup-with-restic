@@ -4,8 +4,8 @@ die(){ echo "$*" >&2; exit 1; }
 
 BACKUP="$0"
 
-command -v borg &>/dev/null \
-	|| die 'Cannot find borg executable!'
+command -v restic &>/dev/null \
+	|| die 'Cannot find restic executable!'
 
 BACKUP_CONF="${BACKUP_CONF:-default}"
 
@@ -25,34 +25,33 @@ fi
 
 case "$1" in
 
-	do-create)
-		borg create \
+	do-backup)
+		restic backup \
 			-x \
-			${OPT_BORG} ${OPT_BORG_CREATE} \
+			${OPT_RESTIC} ${OPT_RESTIC_BACKUP} \
 			${EXCLUDE_FILE:+--exclude-from=${EXCLUDE_FILE}} \
-			::'{hostname}'${SUFFIX}'-{now:%Y-%m-%d_%H:%M}' \
 			${SOURCES[@]:-/}
 		;;
 
-	do-prune)
-		borg prune \
-			${OPT_BORG} ${OPT_BORG_PRUNE} \
-			--prefix='{hostname}'${SUFFIX} \
-			${KEEP_WITHIN:+--keep-within=${KEEP_WITHIN}} \
-			${KEEP_DAILY:+--keep-daily=${KEEP_DAILY}} \
-			${KEEP_WEEKLY:+--keep-weekly=${KEEP_WEEKLY}} \
-			${KEEP_MONTHLY:+--keep-monthly=${KEEP_MONTHLY}} \
-			${KEEP_YEARLY:+--keep-yearly=${KEEP_YEARLY}} \
-			${KEEP_LAST:+--keep-last=${KEEP_LAST}}
+	do-forget)
+		restic forget \
+			${OPT_RESTIC} ${OPT_RESTIC_FORGET} \
+			${KEEP_TAG:+--keep-tag ${KEEP_TAG}} \
+			${KEEP_WITHIN:+--keep-within ${KEEP_WITHIN}} \
+			${KEEP_DAILY:+--keep-daily ${KEEP_DAILY}} \
+			${KEEP_WEEKLY:+--keep-weekly ${KEEP_WEEKLY}} \
+			${KEEP_MONTHLY:+--keep-monthly ${KEEP_MONTHLY}} \
+			${KEEP_YEARLY:+--keep-yearly ${KEEP_YEARLY}} \
+			${KEEP_LAST:+--keep-last ${KEEP_LAST}}
 		;;
 
 	run|"")
-		"${BACKUP}" do-create \
-		|| die "borg failed to create archive."
-		"${BACKUP}" do-prune \
-		|| die "borg failed to prune archives"
+		"${BACKUP}" do-backup \
+		|| die "restic failed to create snapshot."
+		"${BACKUP}" do-forget \
+		|| die "restic failed to forget snapshots"
 		;;
 	*)
-		borg ${OPT_BORG} $*
+		restic ${OPT_RESTIC} $*
 		;;
 esac
