@@ -29,7 +29,7 @@ case "$1" in
 		restic backup \
 			-x \
 			${OPT_RESTIC} ${OPT_RESTIC_BACKUP} \
-			${EXCLUDE_FILE:+--exclude-from=${EXCLUDE_FILE}} \
+			${EXCLUDE_FILE:+--exclude-file=${EXCLUDE_FILE}} \
 			${SOURCES[@]:-/}
 		;;
 
