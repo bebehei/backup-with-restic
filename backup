@@ -4,8 +4,8 @@ die(){ echo "$*" >&2; exit 1; }
 
 BACKUP="$0"
 
-command -v restic &>/dev/null \
-	|| die 'Cannot find restic executable!'
+command -v ${RESTIC:=restic} &>/dev/null \
+	|| die "Cannot find ${RESTIC} executable!"
 
 BACKUP_CONF="${BACKUP_CONF:-default}"
 
@@ -26,7 +26,7 @@ fi
 case "$1" in
 
 	do-backup)
-		restic backup \
+		${RESTIC} backup \
 			-x \
 			${OPT_RESTIC} ${OPT_RESTIC_BACKUP} \
 			${EXCLUDE_FILE:+--exclude-file=${EXCLUDE_FILE}} \
@@ -34,7 +34,7 @@ case "$1" in
 		;;
 
 	do-forget)
-		restic forget \
+		${RESTIC} forget \
 			${OPT_RESTIC} ${OPT_RESTIC_FORGET} \
 			${KEEP_TAG:+--keep-tag ${KEEP_TAG}} \
 			${KEEP_WITHIN:+--keep-within ${KEEP_WITHIN}} \
@@ -52,6 +52,6 @@ case "$1" in
 		|| die "restic failed to forget snapshots"
 		;;
 	*)
-		restic ${OPT_RESTIC} $*
+		${RESTIC} ${OPT_RESTIC} $*
 		;;
 esac
